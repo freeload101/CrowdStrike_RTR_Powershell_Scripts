@@ -21,6 +21,20 @@ https://github.com/KurtDeGreeff/PlayPowershell
 https://github.com/PolarBearGod/CrowdStrike-RTR-Scripts
 
 https://github.com/bk-CS/PSFalcon
+
 https://github.com/bk-cs/PSFalcon/tree/master/real-time-response
 
 
+-----------
+
+
+https://github.com/freeload101/CrowdStrike_RTR_Powershell_Scripts/blob/main/PSFalcon_Runscript_loop_PUBLIC.ps1
+
+
+auto retry
+
+hostname input
+
+string "ALL DONE" to verify scripts completed
+
+add to RTR group
