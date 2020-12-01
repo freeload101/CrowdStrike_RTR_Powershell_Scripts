@@ -38,3 +38,16 @@ hostname input
 string "ALL DONE" to verify scripts completed
 
 add to RTR group
+
+
+---
+
+
+```
+foreach ($Property in (Get-CimInstance Win32_Process  )) { 
+if (((Invoke-CimMethod -InputObject $Property -MethodName GetOwner).User) -eq "USERNAMEHERE" ) {
+Write-Output  Killing $Property.ProcessId
+Stop-Process -Id $Property.ProcessId   -Force
+}
+}
+Write-Output  "ALL DONE"```
