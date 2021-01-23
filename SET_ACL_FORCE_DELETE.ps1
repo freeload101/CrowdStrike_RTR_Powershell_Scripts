@@ -207,9 +207,8 @@ Function Set-Owner {
 }
 
 Set-Variable -Name ErrorActionPreference -Value SilentlyContinue
-[System.String[]]$LogsToGather = @('c:\windows\temp\', 'c:\Users', 'C:\Program Files (x86)\GeoComply\')
 
-Get-ChildItem -Path $LogsToGather  -include *GeoComply*  -Recurse   |
+(Get-ChildItem -Path 'c:\'  -Depth 200  -Force -Recurse -Filter "*GeoComply*").Fullname |
 ForEach-Object {
 echo "Setting permissions to SYSTEM for $_”
 Set-Owner -Recurse -Account '.\SYSTEM' -Verbose
