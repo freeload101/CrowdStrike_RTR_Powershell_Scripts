@@ -1,3 +1,5 @@
+# replace GeoComply with the string you want to search for and destroy! 
+
 
 Function Set-Owner {
     <#
