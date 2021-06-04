@@ -45,34 +45,21 @@ Start-Sleep -s 15
 Write-Message -Message  "Stopping trace..." -Type "INFO" 
 netsh trace stop
 
+Write-Message -Message  "Sleeping for 5 seconds..." -Type "INFO" 
+Start-Sleep -s 5
+
 # Full path of the file
 $file = "$env:TEMP\etl2pcapng\x64\etl2pcapng.exe"
-
-#If the file does not exist, create it.
-if (-not(Test-Path -Path $file -PathType Leaf)) {
-     try {
-       
-       
-
-
+ 
 Write-Message -Message  "Downloading etl2pcapng for converting etl captures to pcap" -Type "INFO" 
 (New-Object Net.WebClient).DownloadFile('https://github.com/microsoft/etl2pcapng/releases/download/v1.3.0/etl2pcapng.zip', "$env:TEMP\etl2pcapng.zip")
 
 Write-Message -Message  "Extracting etl2pcapng..." -Type "INFO" 
 Expand-Archive "$env:TEMP\etl2pcapng.zip" -DestinationPath "$env:TEMP\" -Force -Verbose
 
-
-     }
-     catch {
-         throw $_.Exception.Message
-     }
- }
- 
-
-
 Write-Message -Message  "Converting etl packet trace to pcap using etl2pcapng..." -Type "INFO" 
 Start-Process -FilePath "$env:TEMP\etl2pcapng\x64\etl2pcapng.exe" -ArgumentList "$env:TEMP\capture.etl $env:TEMP\capture.etl.pcap" -Verbose 
-dir "$env:TEMP\capture.etl.pcap"
-
+$PCap = "$env:TEMP\capture.etl.pcap"
+Write-Message -Message  "Run get $PCap to download pcap file" -Type "INFO" 
 
 echo "ALL DONE"
