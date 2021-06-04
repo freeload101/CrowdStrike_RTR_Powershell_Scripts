@@ -1,4 +1,6 @@
-# this will be part of a larger powershell script to automate IR data that Crowdstrike is missing
+Set-Variable -Name ErrorActionPreference -Value SilentlyContinue
+
+
 function Write-Message  {
     <#
     .SYNOPSIS
@@ -40,7 +42,8 @@ netsh trace start capture=yes tracefile="$env:TEMP\capture.etl" maxsize=512 file
 Write-Message -Message  "Capturing packets for 15 seconds..." -Type "INFO" 
 Start-Sleep -s 15
 
-
+Write-Message -Message  "Stopping trace..." -Type "INFO" 
+netsh trace stop
 
 # Full path of the file
 $file = "$env:TEMP\etl2pcapng\x64\etl2pcapng.exe"
@@ -70,3 +73,6 @@ Expand-Archive "$env:TEMP\etl2pcapng.zip" -DestinationPath "$env:TEMP\" -Force -
 Write-Message -Message  "Converting etl packet trace to pcap using etl2pcapng..." -Type "INFO" 
 Start-Process -FilePath "$env:TEMP\etl2pcapng\x64\etl2pcapng.exe" -ArgumentList "$env:TEMP\capture.etl $env:TEMP\capture.etl.pcap" -Verbose 
 dir "$env:TEMP\capture.etl.pcap"
+
+
+echo "ALL DONE"
