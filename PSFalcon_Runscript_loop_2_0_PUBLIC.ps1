@@ -222,6 +222,10 @@ $HostCount = ([regex]::Matches($GetCSInputFileOutput, "hostname" )).count
 
 Write-Message -Message "Resolving $HostCount ids " -Type  "INFO" 
 
+# trim trailing , in list of AIDs
+$GetCSInputFileOutput  = $GetCSInputFileOutput -replace ',$','
+
+
 $CSIdsOut = Get-CSIds -CSHOSTS "$GetCSInputFileOutput"
 
 
