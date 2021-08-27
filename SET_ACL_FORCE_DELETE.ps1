@@ -210,10 +210,6 @@ Function Set-Owner {
 
 Set-Variable -Name ErrorActionPreference -Value SilentlyContinue
 
-(Get-ChildItem -Path 'c:\'  -Depth 200  -Force -Recurse -Filter "*GeoComply*").Fullname |
-ForEach-Object {
-
-
 echo Killing Browsers
 cmd /c taskkill.exe /F /IM chrome.exe
 cmd /c taskkill.exe /F /IM outlook.exe
@@ -229,6 +225,12 @@ logoff 4
 logoff 5
 logoff 6
 logoff 7
+
+
+(Get-ChildItem -Path 'c:\'  -Depth 200  -Force -Recurse -Filter "*GeoComply*").Fullname |
+ForEach-Object {
+
+
 
 echo "Setting permissions to SYSTEM for $_”
 Set-Owner -Recurse -Account '.\SYSTEM' -Verbose
