@@ -27,6 +27,43 @@ echo "$Message"
 
 
 
+Write-Message  -Message  "Running Windows Cleanmgr" -Type "INFO" 
+
+
+$strKeyPath   = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches"
+$strValueName = "StateFlags0065"
+$subkeys      = Get-ChildItem -Path $strKeyPath -Name
+
+ForEach($subkey in $subkeys){
+    $null = New-ItemProperty `
+        -Path $strKeyPath\$subkey `
+        -Name $strValueName `
+        -PropertyType DWord `
+        -Value 2 `
+        -ea SilentlyContinue `
+        -wa SilentlyContinue
+}
+
+Start-Process cleanmgr `
+        -ArgumentList "/sagerun:65" `
+        -Wait `
+        -NoNewWindow `
+        -ErrorAction   SilentlyContinue `
+        -WarningAction SilentlyContinue
+
+ForEach($subkey in $subkeys){
+    $null = Remove-ItemProperty `
+        -Path $strKeyPath\$subkey `
+        -Name $strValueName `
+        -ea SilentlyContinue `
+        -wa SilentlyContinue
+}
+
+
+
+
+
+
 Function Set-Owner {
     <#
         .SYNOPSIS
@@ -261,38 +298,6 @@ Remove-Item "$_\AppData\Roaming\Microsoft\Windows\Cookies\" -Force -Recurse
 Remove-Item "$_\AppData\Roaming\Microsoft\Windows\Recent\" -Force -Recurse 
 Remove-Item "$_\Local Settings\Temporary Internet Files\" -Force -Recurse 
 
-}
-
-
-
-
-$strKeyPath   = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches"
-$strValueName = "StateFlags0065"
-$subkeys      = Get-ChildItem -Path $strKeyPath -Name
-
-ForEach($subkey in $subkeys){
-    $null = New-ItemProperty `
-        -Path $strKeyPath\$subkey `
-        -Name $strValueName `
-        -PropertyType DWord `
-        -Value 2 `
-        -ea SilentlyContinue `
-        -wa SilentlyContinue
-}
-
-Start-Process cleanmgr `
-        -ArgumentList "/sagerun:65" `
-        -Wait `
-        -NoNewWindow `
-        -ErrorAction   SilentlyContinue `
-        -WarningAction SilentlyContinue
-
-ForEach($subkey in $subkeys){
-    $null = Remove-ItemProperty `
-        -Path $strKeyPath\$subkey `
-        -Name $strValueName `
-        -ea SilentlyContinue `
-        -wa SilentlyContinue
 }
 
 
