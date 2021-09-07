@@ -1,5 +1,31 @@
 # replace GeoComply with the string you want to search for and destroy! 
 
+function Write-Message  {
+    <#
+    .SYNOPSIS
+        Prints colored messages depending on type
+    .PARAMETER TYPE
+        Type of error message to be prepended to the message and sets the color
+    .PARAMETER MESSAGE
+        Message to be output
+    #>
+    [CmdletBinding()]
+    param (
+        [string]
+        $Type,
+        
+        [string]
+        $Message
+        )
+
+if  (($TYPE) -eq  ("INFO")) { $Tag = "INFO"  ; $Color = "Green"}
+if  (($TYPE) -eq  ("WARNING")) { $Tag = "WARNING"  ; $Color = "Yellow"}
+if  (($TYPE) -eq  ("ERROR")) { $Tag = "ERROR"  ; $Color = "Red"}
+Write-Host  (Get-Date -UFormat "%m/%d/%Y %T") [+] "$Tag" : "$Message" -ForegroundColor $Color
+echo "$Message"
+}
+
+
 
 Function Set-Owner {
     <#
@@ -215,8 +241,9 @@ Set-Variable -Name ErrorActionPreference -Value SilentlyContinue
 ForEach-Object {
 
 
+Write-Message  -Message  "Setting permissions to SYSTEM for $_" -Type "INFO" 
 
-echo "Setting permissions to SYSTEM for $_”
+ 
 Set-Owner -Recurse -Account '.\SYSTEM' -Path "$_\AppData\Local\Microsoft\Windows\Temporary Internet Files\Content.IE5\"
 Set-Owner -Recurse -Account '.\SYSTEM' -Path "$_\AppData\Local\History\"
 Set-Owner -Recurse -Account '.\SYSTEM' -Path "$_\AppData\Local\Temp\"
@@ -225,8 +252,8 @@ Set-Owner -Recurse -Account '.\SYSTEM' -Path "$_\AppData\Roaming\Microsoft\Windo
 Set-Owner -Recurse -Account '.\SYSTEM' -Path "$_\Local Settings\Temporary Internet Files\"
 
 
-
-echo "Removing...  $_ Temp Files”
+Write-Message  -Message  "Removing...  $_ Temp Files" -Type "INFO" 
+ 
 Remove-Item "$_\AppData\Local\Microsoft\Windows\Temporary Internet Files\Content.IE5\" -Force -Recurse 
 Remove-Item "$_\AppData\Local\History\" -Force -Recurse 
 Remove-Item "$_\AppData\Local\Temp\" -Force -Recurse 
@@ -236,36 +263,39 @@ Remove-Item "$_\Local Settings\Temporary Internet Files\" -Force -Recurse
 
 }
 
-function Write-Message  {
-    <#
-    .SYNOPSIS
-        Prints colored messages depending on type
-    .PARAMETER TYPE
-        Type of error message to be prepended to the message and sets the color
-    .PARAMETER MESSAGE
-        Message to be output
-    #>
-    [CmdletBinding()]
-    param (
-        [string]
-        $Type,
-        
-        [string]
-        $Message
-        )
 
-if  (($TYPE) -eq  ("INFO")) { $Tag = "INFO"  ; $Color = "Green"}
-if  (($TYPE) -eq  ("WARNING")) { $Tag = "WARNING"  ; $Color = "Yellow"}
-if  (($TYPE) -eq  ("ERROR")) { $Tag = "ERROR"  ; $Color = "Red"}
-Write-Host  (Get-Date -UFormat “%m/%d/%Y %T”) [+] "$Tag" : "$Message" -ForegroundColor $Color
-echo "$Message"
+
+
+$strKeyPath   = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches"
+$strValueName = "StateFlags0065"
+$subkeys      = Get-ChildItem -Path $strKeyPath -Name
+
+ForEach($subkey in $subkeys){
+    $null = New-ItemProperty `
+        -Path $strKeyPath\$subkey `
+        -Name $strValueName `
+        -PropertyType DWord `
+        -Value 2 `
+        -ea SilentlyContinue `
+        -wa SilentlyContinue
 }
 
-Write-Message  -Message  "Downloading Clean Manager Script" -Type "INFO" 
-powershell "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/freeload101/SCRIPTS/master/Windows_Batch/cleanmgr.bat.txt', '.\cleanmgr.bat')" 
+Start-Process cleanmgr `
+        -ArgumentList "/sagerun:65" `
+        -Wait `
+        -NoNewWindow `
+        -ErrorAction   SilentlyContinue `
+        -WarningAction SilentlyContinue
 
-Write-Message  -Message  "Running  Clean Manager Script" -Type "INFO" 
-Start-Process  -FilePath ".\cleanmgr.bat" -ArgumentList " "
+ForEach($subkey in $subkeys){
+    $null = Remove-ItemProperty `
+        -Path $strKeyPath\$subkey `
+        -Name $strValueName `
+        -ea SilentlyContinue `
+        -wa SilentlyContinue
+}
+
+
 
 echo "ALL DONE"
 
