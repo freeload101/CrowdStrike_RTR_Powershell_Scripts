@@ -235,5 +235,37 @@ Remove-Item "$_\AppData\Roaming\Microsoft\Windows\Recent\" -Force -Recurse
 Remove-Item "$_\Local Settings\Temporary Internet Files\" -Force -Recurse 
 
 }
+
+function Write-Message  {
+    <#
+    .SYNOPSIS
+        Prints colored messages depending on type
+    .PARAMETER TYPE
+        Type of error message to be prepended to the message and sets the color
+    .PARAMETER MESSAGE
+        Message to be output
+    #>
+    [CmdletBinding()]
+    param (
+        [string]
+        $Type,
+        
+        [string]
+        $Message
+        )
+
+if  (($TYPE) -eq  ("INFO")) { $Tag = "INFO"  ; $Color = "Green"}
+if  (($TYPE) -eq  ("WARNING")) { $Tag = "WARNING"  ; $Color = "Yellow"}
+if  (($TYPE) -eq  ("ERROR")) { $Tag = "ERROR"  ; $Color = "Red"}
+Write-Host  (Get-Date -UFormat “%m/%d/%Y %T”) [+] "$Tag" : "$Message" -ForegroundColor $Color
+echo "$Message"
+}
+
+Write-Message  -Message  "Downloading Clean Manager Script" -Type "INFO" 
+powershell "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/freeload101/SCRIPTS/master/Windows_Batch/cleanmgr.bat.txt', '.\cleanmgr.bat')" 
+
+Write-Message  -Message  "Running  Clean Manager Script" -Type "INFO" 
+Start-Process  -FilePath ".\cleanmgr.bat" -ArgumentList " "
+
 echo "ALL DONE"
 
