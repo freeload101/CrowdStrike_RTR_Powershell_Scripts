@@ -167,7 +167,12 @@ return $CSIds
 
 # MAIN ##############################################################################################
 
-Out-Default; Clear-Host;
+
+Out-Default
+
+# want to keep scroll back
+Clear-Host
+
 
 #bug in Clear-Host to sleep to let screen clear properly
 Start-Sleep -s 1
