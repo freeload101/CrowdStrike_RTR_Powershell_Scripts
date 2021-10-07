@@ -246,7 +246,7 @@ if  (($CSIdsOutCount) -eq  ($HostCount)) {
 } ELSE {
     Write-Message -Message "Unable to resolve all hostnames in input file be sure hostnames are in CS and not hidden. Resolved $CSIdsOutCount of $HostCount hosts" -Type  "WARNING" 
         }
-Invoke-FalconRTR -Command runscript -Arguments "-CloudFile=$SCRIPTNAME" -HostIds $CSIdsOut -QueueOffline  $True
+Invoke-FalconRTR -Command runscript -Arguments "-CloudFile=$SCRIPTNAME" -HostIds $CSIdsOut -QueueOffline  $True -Timeout $VARTIMEOUT
 
 #Get-FalconQueue
 
