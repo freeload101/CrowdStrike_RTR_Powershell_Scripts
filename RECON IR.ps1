@@ -66,14 +66,18 @@ get-nettcpconnection | select local*,remote*,state,@{Name="Process";Expression={
 
 
 
+(Get-ChildItem -Path "C:\Users\*").name |ForEach-Object {
 echo '-------------------------';
-echo "[+] INFO: Displaying recent files for all users"
+echo "[+] INFO: Displaying recent files for all users .lnk targets and Arguments "
 echo '-------------------------';
-Set-Variable -Name ErrorActionPreference -Value SilentlyContinue
+Get-BrowserData  -UserName $_
+Get-ChildItem -Path "C:\Users\$_\AppData\Roaming\Microsoft\Windows\Recent" -Filter *.lnk -Recurse -ErrorAction SilentlyContinue -Force  |ForEach-Object {
 $WScript = New-Object -ComObject WScript.Shell
-Get-ChildItem -Path "C:\Users\*" -Filter *.lnk -Recurse -ErrorAction SilentlyContinue -Force  | ForEach-Object {
 $WScript.CreateShortcut($_.FullName).TargetPath
-$WScript.CreateShortcut($_.FullName).Arguments}| sort -Unique | Select-String -Pattern 'WINDOWS|Teams|program files' -NotMatch 
+$WScript.CreateShortcut($_.FullName).Arguments 
+}
+}| sort -Unique | Select-String -Pattern 'WINDOWS|Teams|program files' -NotMatch 
+
 
 function Get-BrowserData {
     <#
