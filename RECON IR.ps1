@@ -62,8 +62,17 @@ echo '-------------------------';
 echo '-------------------------';
 echo "[+] INFO: Getting netstat info"
 echo '-------------------------';
-get-nettcpconnection | select local*,remote*,state,@{Name="Process";Expression={(Get-Process -Id $_.OwningProcess).Path}}  |Select-String -Pattern "(0.0.0.0|127.0.0.1|chrome|RemoteAddress=::;|outlook|msedge|SearchUI|SystemSettings|teams|vpnagent|onedrive)" -NotMatch 
+#OLD get-nettcpconnection | select local*,remote*,state,@{Name="Process";Expression={(Get-Process -Id $_.OwningProcess).Path}}  |Select-String -Pattern "(0.0.0.0|127.0.0.1|chrome|RemoteAddress=::;|outlook|msedge|SearchUI|SystemSettings|teams|vpnagent|onedrive)" -NotMatch 
+Get-NetTCPConnection | Where-Object { $_.State -eq 'ESTABLISHED' -and $_.RemoteAddress -notmatch '^10\.|^192\.168\.|^127\.|\b:\b|::' } |Sort-Object -Unique -Property RemoteAddress |foreach-object {
+$PROC_PATH = (Get-Process -Id $_.OwningProcess).Path
+    if ($PROC_PATH -notmatch 'Teams|chrome|outlook') {
+    $REMOTEIP = $_.RemoteAddress
+    $WHOIS = ((Invoke-Restmethod "http://whois.arin.net/rest/ip/$REMOTEIP"  -ErrorAction stop ).net.orgRef.name) 
+    #(Invoke-Restmethod "http://whois.arin.net/rest/ip/$REMOTEIP"  -ErrorAction stop ).net.orgRef.name
+    Write-Output "$REMOTEIP,$WHOIS,$PROC_PATH"
+    }
 
+}
 
 
 (Get-ChildItem -Path "C:\Users\*").name |ForEach-Object {
