@@ -1,6 +1,11 @@
 Set-Variable -Name ErrorActionPreference -Value SilentlyContinue
 
 echo '-------------------------';
+echo "[+] INFO: Installed Software"
+echo '-------------------------';
+Get-WmiObject -Class Win32_Product | Where-Object { $_.Vendor -notmatch 'Palo|Levi|Adobe|Microsoft|dell|cybersafe|displaylink|VPSX|python|mimecast|forcepoint|google|crowdstrike|Oracle|cisco|ServiceNow|Asmedia' } | Select-Object -ExpandProperty Name
+
+echo '-------------------------';
 echo "[+] INFO: Showing Default Chrome Plugins"
 echo '-------------------------';
 
