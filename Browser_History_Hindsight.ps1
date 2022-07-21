@@ -15,4 +15,7 @@ Start-Process -FilePath "C:\windows\Temp\ftech_temp\hindsight.exe" -ArgumentList
 Get-ChildItem  C:\windows\Temp\ftech_temp\ -filter *.xlsx |
 Compress-Archive -Destination C:\windows\Temp\ftech_temp\hindsight.zip -Force
 
-echo "type: get C:\windows\Temp\ftech_temp\hindsight.zip"
+echo "type: "
+echo "get C:\windows\Temp\ftech_temp\hindsight.zip"
+echo "When Download is complete the password is infected type:"
+echo "rm C:\windows\Temp\ftech_temp -force"
