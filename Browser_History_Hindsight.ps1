@@ -16,8 +16,11 @@ Invoke-WebRequest -Uri "https://github.com/obsidianforensics/hindsight/releases/
 
 Get-ChildItem -Directory -Path "C:\Users\$_"   -ErrorAction SilentlyContinue -Force | Sort LastWriteTime  -Descending | Select-Object -First 4 | ForEach-Object {
 echo "[+] INFO: Dumping $_ MSEdge/Chrome"
-Start-Process -FilePath "C:\windows\Temp\ftech_temp\hindsight.exe" -ArgumentList  "   -i `"c:\Users\$_\AppData\Local\Microsoft\Edge\User Data\Default`" -o `"C:\windows\Temp\ftech_temp\$_ Edge`"  " -WorkingDirectory "C:\windows\Temp\ftech_temp\"  -Verbose -WindowStyle Hidden 
-Start-Process -FilePath "C:\windows\Temp\ftech_temp\hindsight.exe" -ArgumentList  "   -i `"c:\Users\$_\AppData\Local\Google\Chrome\User Data\Default`" -o `"C:\windows\Temp\ftech_temp\$_ Chrome`"  " -WorkingDirectory "C:\windows\Temp\ftech_temp\"  -Verbose -WindowStyle Hidden  
+New-Item -Path "C:\windows\Temp\ftech_temp\$_ Chrome"  -ItemType Directory | Out-Null
+New-Item -Path "C:\windows\Temp\ftech_temp\$_ Edge"  -ItemType Directory | Out-Null
+Start-Process -FilePath "C:\windows\Temp\ftech_temp\hindsight.exe" -ArgumentList  " -i `"c:\Users\$_\AppData\Local\Microsoft\Edge\User Data\Default`" -o `"C:\windows\Temp\ftech_temp\$_ Edge`"  " -WorkingDirectory "C:\windows\Temp\ftech_temp\$_ Edge"  -Verbose -WindowStyle Hidden 
+Start-Process -FilePath "C:\windows\Temp\ftech_temp\hindsight.exe" -ArgumentList  " -i `"c:\Users\$_\AppData\Local\Google\Chrome\User Data\Default`" -o `"C:\windows\Temp\ftech_temp\$_ Chrome`"  " -WorkingDirectory "C:\windows\Temp\ftech_temp\$_ Chrome"  -Verbose -WindowStyle Hidden  
+
 } 
 
 echo "[+] INFO: Waiting upto 5 minutes for Hindsight to complete"
