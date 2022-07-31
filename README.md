@@ -1,5 +1,7 @@
 # CrowdStrike_RTR_Powershell_Scripts
 
+RTR_browsinghistoryview.ps1
+![image](https://user-images.githubusercontent.com/4307863/182012315-44fd283d-8219-491d-8d61-c4d5d27bbf13.png)
 
 Getting into RTR scripting
 
