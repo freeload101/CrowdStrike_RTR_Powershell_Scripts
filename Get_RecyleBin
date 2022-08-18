@@ -1,0 +1,14 @@
+Set-Variable -Name ErrorActionPreference -Value SilentlyContinue
+
+(Get-ChildItem -Path 'C:\$Recycle.Bin' -Force  ) | select * | ForEach-Object {
+Write-Output "[+] User: $((New-Object System.Security.Principal.SecurityIdentifier(($_).BaseName)).Translate([System.Security.Principal.NTAccount]).value) Path: $(($_).FullName)"
+    ($_).FullName | ForEach-Object {
+    #Write-Output $_.FullName
+        Get-ChildItem -Path  $_  -Force -Recurse -Depth 2 | ForEach-Object {
+            #if (($_).Name -match '$' -and ((Get-Item ($).FullName).length -lt 500 ) ) {  
+            if ((($_).Name -match '\$') -and ((Get-Item ($_).FullName).length -lt 500 )) {
+                Write-Output "$((Get-Content ($_).FullName) -replace '.*\u0001.','' -replace '\u0000','')`t $($_.FullName)"
+            }
+        }
+    }
+}
