@@ -1,14 +1,21 @@
-Set-Variable -Name ErrorActionPreference -Value SilentlyContinue
+echo '-------------------------';
+echo "[+] INFO: Dumping Recycle Bin only 3 paths deep"
+echo '-------------------------';
 
-(Get-ChildItem -Path 'C:\$Recycle.Bin' -Force  ) | select * | ForEach-Object {
-Write-Output "[+] User: $((New-Object System.Security.Principal.SecurityIdentifier(($_).BaseName)).Translate([System.Security.Principal.NTAccount]).value) Path: $(($_).FullName)"
-    ($_).FullName | ForEach-Object {
-    #Write-Output $_.FullName
-        Get-ChildItem -Path  $_  -Force -Recurse -Depth 2 | ForEach-Object {
-            #if (($_).Name -match '$' -and ((Get-Item ($).FullName).length -lt 500 ) ) {  
-            if ((($_).Name -match '\$') -and ((Get-Item ($_).FullName).length -lt 500 )) {
-                Write-Output "$((Get-Content ($_).FullName) -replace '.*\u0001.','' -replace '\u0000','')`t $($_.FullName)"
-            }
-        }
+(Get-ChildItem -Path 'C:\$Recycle.Bin' -Force -Recurse -depth 3  ) | select * | ForEach-Object {
+    if (($_).Name -match '\$I') {
+        $VarMeta = "$((Get-Content ($_).FullName) -replace '.*\u0001.','' -replace '\u0000','')"
+        Clear-Variable -Name varPath
     }
+    if (($_).Name -match 'S-.-.-.'){
+        $VarUser = "$((New-Object System.Security.Principal.SecurityIdentifier(($_).BaseName)).Translate([System.Security.Principal.NTAccount]).value)"
+    }
+    if (($_).Name -match '\$R'){
+        Clear-Variable -Name varPath
+    } else {
+        $varPath = "$($_.FullName)"
+        Write-Output "$($VarUser)`t$($VarMeta)`t$($varPath)" 
+        Clear-Variable -Name varPath,VarMeta
+    }
+    
 }
