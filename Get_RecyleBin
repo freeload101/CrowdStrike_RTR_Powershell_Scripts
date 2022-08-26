@@ -1,3 +1,6 @@
+Set-Variable -Name ErrorActionPreference -Value SilentlyContinue
+
+
 echo '-------------------------';
 echo "[+] INFO: Dumping Recycle Bin only 3 paths deep"
 echo '-------------------------';
