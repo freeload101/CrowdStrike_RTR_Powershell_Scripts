@@ -1,4 +1,4 @@
-Set-Variable -Name ErrorActionPreference -Value SilentlyContinue
+#Set-Variable -Name ErrorActionPreference -Value SilentlyContinue
 
 
 function Write-Message  {
@@ -30,20 +30,24 @@ echo  "$date1 [+] $Tag : $Message"
 
 
 Write-Message -Message  "Stopping trace..." -Type "INFO" 
-netsh trace stop
+Start-Process -FilePath "C:\Windows\System32\netsh.exe" -WorkingDirectory "$env:TEMP" -ArgumentList " trace stop " 
+
 
 
 Write-Message -Message  "Removing old capture files..." -Type "INFO" 
 del capture..*
 Start-Sleep -s 2
 Write-Message -Message  "Starting packet trace..." -Type "INFO" 
-netsh trace start capture=yes tracefile="$env:TEMP\capture.etl" maxsize=512 filemode=circular overwrite=yes report=no correlation=no Ethernet.Type=IPv4
+#netsh trace start capture=yes tracefile="$env:TEMP\capture.etl" maxsize=512 filemode=circular overwrite=yes report=no correlation=no Ethernet.Type=IPv4
+Start-Process -FilePath "C:\Windows\System32\netsh.exe" -WorkingDirectory "$env:TEMP" -ArgumentList " trace start capture=yes tracefile=`"$env:TEMP\capture.etl`" maxsize=512 filemode=circular overwrite=yes report=no correlation=no Ethernet.Type=IPv4 " 
+
 
 Write-Message -Message  "Capturing packets for 15 seconds..." -Type "INFO" 
 Start-Sleep -s 15
 
-Write-Message -Message  "Stopping trace..." -Type "INFO" 
-netsh trace stop
+Write-Message -Message  "Stopping trace...This can take a 1-5min " -Type "INFO" 
+#netsh trace stop
+Start-Process -FilePath "C:\Windows\System32\netsh.exe" -WorkingDirectory "$env:TEMP" -ArgumentList " trace stop  " -Wait -NoNewWindow -
 
 Write-Message -Message  "Sleeping for 5 seconds..." -Type "INFO" 
 Start-Sleep -s 5
