@@ -10,25 +10,25 @@
 
 # Refrence: https://www.reddit.com/r/PowerShell/comments/867755/function_to_write_to_global_variable/
 # https://www.reddit.com/r/crowdstrike/comments/l6yed2/psfalcon2_run_script/
-# https://www.reddit.com/r/crowdstrike/comments/n46um7/psfalcon_20_queueoffline/
 
 # INIT  ##############################################################################################
 
 # timout for runscript to complete/connect ?
-$VARTIMEOUT = 600
+#$VARTIMEOUT = "600"
+$VARTIMEOUT = "600"
 # keys to auth for API
-$key = "#################################"
-$secret = "#################################"
+$key = "XXXXXXXXXXXXXXXXXXXXXXXXX"
+$secret = "XXXXXXXXXXXXXXXXXXXXXXXXXXX"
 # Scriptname to execute on hosts
-$SCRIPTNAME = "RTR_TEST"
+$SCRIPTNAME = "Remote_Bitlocker_Secure_Wipe"
 # RTR group to be added (this can take upto 20min to apply even if host is online )
-$RTRGROUPID = "25##################################1"
+$RTRGROUPID = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 
 # Destination cloud 
 $CLOUD = "us-1"
 
 #   Child environment to use for authentication in multi-CID configurations 
-$MEMBERCID = "#################################"
+$MEMBERCID = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 
  
 
@@ -154,11 +154,11 @@ function Get-CSIds {
         
 $CSHostList = Get-FalconHost -Filter "$CSHOSTS"
   foreach($i in $CSHostList) {
-
     $CSIds = $CSIds + "$i,"
     }
     # trim trailing , in list of AIDs
     $CSIds = $CSIds -replace ',$',''
+   
 return $CSIds
 }
 
@@ -173,6 +173,14 @@ Out-Default
 # want to keep scroll back
 Clear-Host
 
+# install Module if not exist
+
+If(-not(Get-InstalledModule PSFalcon -ErrorAction silentlycontinue)){
+    Install-Module PSFalcon -Confirm:$False -Force
+}
+
+ 
+Import-Module -Name PSFalcon
 
 #bug in Clear-Host to sleep to let screen clear properly
 Start-Sleep -s 1
@@ -181,9 +189,10 @@ Write-Message  -Message  "All uploaded scripts must have  echo ALL DONE at the e
 
 # IMPORT MODULE
 
-Write-Message -Message "Loading PSFalcon Module" -Type "INFO" 
+
 
 try {
+    Write-Message -Message "Loading PSFalcon Module" -Type "INFO" 
     Import-Module -Name PSFalcon  -ErrorAction Stop 
     } catch {
     Write-Message -Message "import-Module -Name PSFalcon failed please install PSFalcon and dependencies" -Type "ERROR"  
@@ -227,12 +236,16 @@ $HostCount = ([regex]::Matches($GetCSInputFileOutput, "hostname" )).count
 
 Write-Message -Message "Resolving $HostCount ids " -Type  "INFO" 
 
-# trim trailing , in list of AIDs
-$GetCSInputFileOutput  = $GetCSInputFileOutput -replace ',$','
+# NOT WORKING !?!?!?! $CSIdsOut = Get-CSIds -CSHOSTS "$GetCSInputFileOutput"
+# working but not really $CSIdsOut = Get-FalconHost -Filter "$GetCSInputFileOutput"
 
+# trim trailing , in list of AIDs
+$GetCSInputFileOutput  = $GetCSInputFileOutput -replace ',$',''
 
 $CSIdsOut = Get-CSIds -CSHOSTS "$GetCSInputFileOutput"
 
+
+ 
 
 #convert CSIdsOut to an array 
 $CSIdsOut = $CSIdsOut -split ','
@@ -247,8 +260,9 @@ if  (($CSIdsOutCount) -eq  ($HostCount)) {
     Write-Message -Message "Unable to resolve all hostnames in input file be sure hostnames are in CS and not hidden. Resolved $CSIdsOutCount of $HostCount hosts" -Type  "WARNING" 
         }
 
-Write-Message -Message "Running script: $SCRIPTNAME on $CSIdsOutCount hosts with maxium timeout of $VARTIMEOUT seconds" -Type  "INFO"
-Invoke-FalconRTR -Command runscript -Arguments "-CloudFile=$SCRIPTNAME" -HostIds $CSIdsOut -QueueOffline  $True -Timeout $VARTIMEOUT
+
+Write-Message -Message "Running script: $SCRIPTNAME on $CSIdsOutCount hosts with maximum timeout of $VARTIMEOUT seconds" -Type  "INFO"
+Invoke-FalconRTR -Command runscript -Arguments "-CloudFile=$SCRIPTNAME" -HostIds $CSIdsOut -QueueOffline  $True  -Timeout $VARTIMEOUT | Out-File -FilePath .\output.txt -Width 999999999 
 
 #Get-FalconQueue
 
