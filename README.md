@@ -1,3 +1,9 @@
+# More Stuff:
+
+https://github.com/freeload101/SCRIPTS/tree/master/CrowdStrike%20Threat%20Hunting
+
+https://github.com/freeload101/SCRIPTS/tree/master/Bash/CS_BADGER
+
 # CrowdStrike_RTR_Powershell_Scripts
 
 RTR_browsinghistoryview.ps1
