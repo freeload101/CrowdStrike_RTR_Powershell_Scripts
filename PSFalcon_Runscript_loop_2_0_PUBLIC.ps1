@@ -17,18 +17,18 @@
 #$VARTIMEOUT = "600"
 $VARTIMEOUT = "600"
 # keys to auth for API
-$key = "XXXXXXXXXXXXXXXXXXXXXXXXX"
-$secret = "XXXXXXXXXXXXXXXXXXXXXXXXXXX"
+$key = "XXXXXXXXXXXXXXXXXXX"
+$secret = "XXXXXXXXXXXXXXXXXXXXXXX"
 # Scriptname to execute on hosts
 $SCRIPTNAME = "Remote_Bitlocker_Secure_Wipe"
 # RTR group to be added (this can take upto 20min to apply even if host is online )
-$RTRGROUPID = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+$RTRGROUPID = "XXXXXXXXXXXXXXXXXXXXXXXXXXX"
 
 # Destination cloud 
 $CLOUD = "us-1"
 
 #   Child environment to use for authentication in multi-CID configurations 
-$MEMBERCID = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+$MEMBERCID = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 
  
 
@@ -167,16 +167,29 @@ return $CSIds
 
 # MAIN ##############################################################################################
 
+Write-Message  -Message  "Setting locatoin to $VARCD" -Type "WARNING" 
+$VARCD = (Get-Location)
+
+Write-Message  -Message  "Updating PSFalcon" -Type "WARNING" 
+Update-Module -Name PSFalcon
+
+
+
 
 Out-Default
 
 # want to keep scroll back
-Clear-Host
+#Clear-Host
 
 # install Module if not exist
 
 If(-not(Get-InstalledModule PSFalcon -ErrorAction silentlycontinue)){
-    Install-Module PSFalcon -Confirm:$False -Force
+Write-Message  -Message  "Downloading PSFalcon" -Type "WARNING" 
+
+$downloadUri = (Invoke-RestMethod -Method GET -Uri "https://api.github.com/repos/CrowdStrike/psfalcon/releases/latest").zipball_url
+Invoke-WebRequest -Uri $downloadUri -Out "$VARCD\psfalcon.zip"
+Expand-Archive -Path "$VARCD\psfalcon.zip" -DestinationPath "$VARCD\psfalcon" -Force
+Install-Module -Name PSFalcon -Scope CurrentUser
 }
 
  
@@ -262,8 +275,19 @@ if  (($CSIdsOutCount) -eq  ($HostCount)) {
 
 
 Write-Message -Message "Running script: $SCRIPTNAME on $CSIdsOutCount hosts with maximum timeout of $VARTIMEOUT seconds" -Type  "INFO"
-Invoke-FalconRTR -Command runscript -Arguments "-CloudFile=$SCRIPTNAME" -HostIds $CSIdsOut -QueueOffline  $True  -Timeout $VARTIMEOUT | Out-File -FilePath .\output.txt -Width 999999999 
+Invoke-FalconRTR -Command runscript -Arguments "-CloudFile=$SCRIPTNAME" -HostIds $CSIdsOut -QueueOffline  $True  -Timeout $VARTIMEOUT | Out-File -FilePath "$VARCD\output.txt" -Width 999999999   
 
-#Get-FalconQueue
+
+Start-Sleep -Seconds 5
+
+Write-Message -Message "Showing contents of $VARCD\output.txt " -Type "INFO"
+
+Get-Content "$VARCD\output.txt" 
+
+Write-Message -Message "Open the CSV below or run the Get-FalconQueue again to get status output to a new CSV file" -Type "INFO"
+Get-FalconQueue -Verbose
+
+
+Get-FalconQueue | Where-Object name -like *.exe
 
 exit
