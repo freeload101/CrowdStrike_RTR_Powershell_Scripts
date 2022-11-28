@@ -167,7 +167,7 @@ return $CSIds
 
 # MAIN ##############################################################################################
 
-Write-Message  -Message  "Setting locatoin to $VARCD" -Type "WARNING" 
+Write-Message  -Message  "Setting location to $VARCD" -Type "WARNING" 
 $VARCD = (Get-Location)
 
 Write-Message  -Message  "Updating PSFalcon" -Type "WARNING" 
