@@ -1,3 +1,4 @@
+
 Set-Variable -Name ErrorActionPreference -Value SilentlyContinue
 echo '-------------------------';
 echo "[+] INFO: CPU Usage TOP 20"
@@ -67,21 +68,21 @@ echo '-------------------------';
       }
       
       
-echo '-------------------------';
-echo "[+] INFO: Getting netstat info"
-echo '-------------------------';
-#OLD get-nettcpconnection | select local*,remote*,state,@{Name="Process";Expression={(Get-Process -Id $_.OwningProcess).Path}}  |Select-String -Pattern "(0.0.0.0|127.0.0.1|chrome|RemoteAddress=::;|outlook|msedge|SearchUI|SystemSettings|teams|vpnagent|onedrive)" -NotMatch 
-Get-NetTCPConnection | Where-Object { $_.State -eq 'ESTABLISHED' -and $_.RemoteAddress -notmatch '^10\.|^192\.168\.|^127\.|\b:\b|::|^172\.' } |Sort-Object -Unique -Property RemoteAddress |foreach-object {
-$PROC_PATH = (Get-Process -Id $_.OwningProcess).Path
-    if ($PROC_PATH -notmatch 'Teams|chrome|outlook') {
-    $REMOTEIP = $_.RemoteAddress
-    $WHOIS = ((Invoke-Restmethod "http://whois.arin.net/rest/ip/$REMOTEIP"  -ErrorAction stop ).net.orgRef.name) 
-    #(Invoke-Restmethod "http://whois.arin.net/rest/ip/$REMOTEIP"  -ErrorAction stop ).net.orgRef.name
-    Write-Output "$REMOTEIP,$WHOIS,$PROC_PATH"
+    echo '-------------------------';
+    echo "[+] INFO: Getting netstat info"
+    echo '-------------------------';
+    #OLD get-nettcpconnection | select local*,remote*,state,@{Name="Process";Expression={(Get-Process -Id $_.OwningProcess).Path}}  |Select-String -Pattern "(0.0.0.0|127.0.0.1|chrome|RemoteAddress=::;|outlook|msedge|SearchUI|SystemSettings|teams|vpnagent|onedrive)" -NotMatch 
+    Get-NetTCPConnection | Where-Object { $_.State -eq 'ESTABLISHED' -and $_.RemoteAddress -notmatch '^10\.|^192\.168\.|^127\.|\b:\b|::|^172\.' } |Sort-Object -Unique -Property RemoteAddress |foreach-object {
+    $PROC_PATH = (Get-Process -Id $_.OwningProcess).Path
+        if ($PROC_PATH -notmatch 'Teams|chrome|outlook') {
+        $REMOTEIP = $_.RemoteAddress
+        $LocalPort = $_.LocalPort
+        $WHOIS = ((Invoke-Restmethod "http://whois.arin.net/rest/ip/$REMOTEIP"  -ErrorAction stop ).net.orgRef.name) 
+        #(Invoke-Restmethod "http://whois.arin.net/rest/ip/$REMOTEIP"  -ErrorAction stop ).net.orgRef.name
+        Write-Output "$REMOTEIP,$LocalPort,$WHOIS,$PROC_PATH"
+        }
+
     }
-
-}
-
 
 (Get-ChildItem -Path "C:\Users\*").name |ForEach-Object {
 echo '-------------------------';
@@ -134,6 +135,6 @@ Get-ChildItem -Directory -Path "C:\Users\$_"    -ErrorAction SilentlyContinue -F
 		echo "[+] INFO: Displaying History for $_ MSEdge/Chrome "
 		echo '-------------------------';
         Start-Process -FilePath "C:\windows\Temp\ftech_temp\BrowsingHistoryView.exe" -ArgumentList  " /HistorySource 4 /HistorySourceFolder `"C:\users\$_\`"  /VisitTimeFilterType 3 /VisitTimeFilterValue 2 /LoadIE 1 /LoadFirefox 1 /LoadChrome 1 /scomma `"C:\windows\Temp\ftech_temp\report.csv`" /sort `"Visit Time`""  -Wait  -Verbose -WindowStyle Hidden   
-        Import-Csv "C:\windows\Temp\ftech_temp\report.csv" | Select -ExpandProperty  URL |Get-Unique -AsString
+        Import-Csv "C:\windows\Temp\ftech_temp\report.csv" | Select -ExpandProperty  URL |Get-Unique -AsString | Select-String -Pattern "(newell|crowdstrike|pingidentity)" -NotMatch
     }
 }
