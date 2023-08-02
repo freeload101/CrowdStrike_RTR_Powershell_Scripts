@@ -135,6 +135,16 @@ Get-ChildItem -Directory -Path "C:\Users\$_"    -ErrorAction SilentlyContinue -F
 		echo "[+] INFO: Displaying History for $_ MSEdge/Chrome "
 		echo '-------------------------';
         Start-Process -FilePath "C:\windows\Temp\ftech_temp\BrowsingHistoryView.exe" -ArgumentList  " /HistorySource 4 /HistorySourceFolder `"C:\users\$_\`"  /VisitTimeFilterType 3 /VisitTimeFilterValue 2 /LoadIE 1 /LoadFirefox 1 /LoadChrome 1 /scomma `"C:\windows\Temp\ftech_temp\report.csv`" /sort `"Visit Time`""  -Wait  -Verbose -WindowStyle Hidden   
-        Import-Csv "C:\windows\Temp\ftech_temp\report.csv" | Select -ExpandProperty  URL |Get-Unique -AsString | Select-String -Pattern "(newell|crowdstrike|pingidentity)" -NotMatch
+        
+        $CSV = Import-Csv -Path "C:\windows\Temp\ftech_temp\report.csv" 
+        $some = $CSV | Group-Object -Property Title 
+
+        $some | ForEach-Object  { 
+        $VarTitle = $_.Group.Title | Select-Object -First 1  -Unique
+        $VarURL = $_.Group.URL.PadRight(100).Substring(0,100).TrimEnd() | Select-Object -First 1  -Unique 
+        Write-Output "$VarTitle,$VarURL" 
+        }  | Select-String -Pattern "(newell|crowdstrike|pingidentity)" -NotMatch 
+
     }
+
 }
