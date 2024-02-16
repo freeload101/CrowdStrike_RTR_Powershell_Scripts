@@ -66,6 +66,10 @@ echo '-------------------------';
               }
           }
       }
+    echo '-------------------------';
+    echo "[+] INFO: Getting External IP"
+    echo '-------------------------';
+    Invoke-WebRequest -Uri "http://ifconfig.io" -UseBasicParsing
       
       
     echo '-------------------------';
