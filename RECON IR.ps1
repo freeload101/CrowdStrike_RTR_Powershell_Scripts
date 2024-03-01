@@ -157,5 +157,5 @@ echo "[+] INFO: Displaying 100 Uniq Event logs Security,Application,System,Setup
 echo '-------------------------';
 
 Write-Output Security,Application,System,Setup,ForwardedEvents,"Windows PowerShell"  | foreach-object {
-Get-EventLog -LogName $_ -EntryType Warning,Error | Select-Object -Last 10000 | select Source,Message | Sort-Object -Unique| Format-Table -AutoSize
+Get-EventLog -LogName $_   | Select-Object -Last 100  | Sort-Object -Unique| Format-Table -AutoSize
 }
