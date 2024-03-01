@@ -70,8 +70,7 @@ echo '-------------------------';
     echo "[+] INFO: Getting External IP"
     echo '-------------------------';
     Invoke-WebRequest -Uri "http://ifconfig.io" -UseBasicParsing
-      
-      
+    
     echo '-------------------------';
     echo "[+] INFO: Getting netstat info"
     echo '-------------------------';
@@ -151,4 +150,12 @@ Get-ChildItem -Directory -Path "C:\Users\$_"    -ErrorAction SilentlyContinue -F
 
     }
 
+}
+
+echo '-------------------------';
+echo "[+] INFO: Displaying 100 Uniq Event logs Security,Application,System,Setup,ForwardedEvents, Windows PowerShell  "
+echo '-------------------------';
+
+Write-Output Security,Application,System,Setup,ForwardedEvents,"Windows PowerShell"  | foreach-object {
+Get-EventLog -LogName $_   | Select-Object -Last 100 | select Source,Message | Sort-Object -Unique| Format-Table -AutoSize
 }
